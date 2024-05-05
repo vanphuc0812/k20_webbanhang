@@ -1,14 +1,11 @@
 package com.vanphuc.webbanhang.user.controller;
 
-import com.vanphuc.webbanhang.common.model.ResponeDTO;
 import com.vanphuc.webbanhang.common.utils.ResponseUtil;
 import com.vanphuc.webbanhang.user.dto.UserDTO;
-import com.vanphuc.webbanhang.user.model.User;
+import com.vanphuc.webbanhang.user.dto.UserDTOForSave;
 import com.vanphuc.webbanhang.user.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/user")
@@ -22,17 +19,15 @@ public class UserRestResource {
     @GetMapping("/findall")
     public Object findAllUser() {
         return ResponseUtil.get(
-                userService.findAll()
+                userService.findAll(UserDTO.class)
                 , HttpStatus.OK
         );
     }
 
     @PostMapping("/save")
-    public Object saveUser(@RequestParam String username, @RequestParam String password, @RequestParam String email) {
+    public Object saveUser(@RequestBody UserDTOForSave userDTOForSave) {
         return ResponseUtil.get(
-                userService.save(username, password, email), HttpStatus.OK
+                userService.save(userDTOForSave), HttpStatus.OK
         );
     }
-
-//    @GetMapping("login")
 }

@@ -10,7 +10,9 @@ import java.util.UUID;
 @Repository  // = @Component + special fucntion: repositoty
 public interface UserRepository extends JpaRepository<User, UUID> {
     User save(User user);
+
     List<User> findAll();
+
     User findByUsername(String pUsername); // "Select * from user where username = pUsername
 }
 //Hibernate implements JPA
