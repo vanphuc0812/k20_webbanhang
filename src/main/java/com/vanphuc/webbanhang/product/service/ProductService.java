@@ -1,16 +1,16 @@
 package com.vanphuc.webbanhang.product.service;
 
-import org.springframework.stereotype.Service;
+import com.vanphuc.webbanhang.common.service.GenericService;
+import com.vanphuc.webbanhang.product.dto.ProductDTO;
+import com.vanphuc.webbanhang.product.dto.ProductDTOForSave;
+import com.vanphuc.webbanhang.product.dto.ProductDTOForUpdate;
+import com.vanphuc.webbanhang.product.model.Product;
 
-@Service
-public interface ProductService {
-//    private ProductRepository productRepository;
+import java.util.UUID;
 
-//    public ProductService(ProductRepository productRepository) {
-//        this.productRepository = productRepository;
-//    }
-//
-//    public Product save(Product product) {
-//        return productRepository.save(product);
-//    }
+
+public interface ProductService extends GenericService<Product, ProductDTO, UUID> {
+    ProductDTO save(ProductDTOForSave dto);
+
+    ProductDTO update(ProductDTOForUpdate dto);
 }

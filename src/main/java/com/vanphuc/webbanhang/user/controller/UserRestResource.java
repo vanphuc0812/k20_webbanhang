@@ -4,13 +4,14 @@ import com.vanphuc.webbanhang.common.utils.ResponseUtil;
 import com.vanphuc.webbanhang.user.dto.UserDTO;
 import com.vanphuc.webbanhang.user.dto.UserDTOForSave;
 import com.vanphuc.webbanhang.user.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/user")
 public class UserRestResource {
-    private UserService userService;
+    private final UserService userService;
 
     public UserRestResource(UserService userService) {
         this.userService = userService;
@@ -25,7 +26,7 @@ public class UserRestResource {
     }
 
     @PostMapping("/save")
-    public Object saveUser(@RequestBody UserDTOForSave userDTOForSave) {
+    public Object saveUser(@RequestBody @Valid UserDTOForSave userDTOForSave) {
         return ResponseUtil.get(
                 userService.save(userDTOForSave), HttpStatus.OK
         );

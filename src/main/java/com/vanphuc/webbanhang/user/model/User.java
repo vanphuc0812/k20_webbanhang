@@ -18,9 +18,9 @@ import java.util.Set;
 @Table(name = UserEntity.User.TABLE_NAME)
 public class User extends BaseEntity {
 
-    @Column(name = UserEntity.User.USERNAME)
+    @Column(name = UserEntity.User.USERNAME, unique = true, nullable = false)
     private String username;
-    @Column(name = UserEntity.User.PASSWORD)
+    @Column(name = UserEntity.User.PASSWORD, nullable = false)
     private String password;
     @Column(name = UserEntity.User.EMAIL)
     private String email;
