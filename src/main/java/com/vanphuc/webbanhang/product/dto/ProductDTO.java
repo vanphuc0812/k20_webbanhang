@@ -1,14 +1,14 @@
 package com.vanphuc.webbanhang.product.dto;
 
-import com.vanphuc.webbanhang.order.model.Order;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.util.Set;
 import java.util.UUID;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProductDTO {
@@ -17,5 +17,5 @@ public class ProductDTO {
     private String catalog;
     private String image;
     private String price;
-    private Set<Order> orders;
+//    private Set<Order> orders;
 }

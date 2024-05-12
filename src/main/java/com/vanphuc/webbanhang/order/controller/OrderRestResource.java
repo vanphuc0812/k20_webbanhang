@@ -1,15 +1,12 @@
 package com.vanphuc.webbanhang.order.controller;
 
 import com.vanphuc.webbanhang.common.utils.ResponseUtil;
-import com.vanphuc.webbanhang.order.dto.OrderDTO;
 import com.vanphuc.webbanhang.order.dto.OrderDTOForSave;
 import com.vanphuc.webbanhang.order.service.OrderService;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -23,7 +20,7 @@ public class OrderRestResource {
 
     @GetMapping("/findAll")
     public Object findAll() {
-        return orderService.findAll(OrderDTO.class);
+        return orderService.findAll();
     }
 
     @GetMapping("/findByID")
@@ -31,8 +28,34 @@ public class OrderRestResource {
         return orderService.findById(id);
     }
 
+    @GetMapping("/findOrderByUsername")
+    public Object findOrderByUsername(@RequestParam String username) {
+        return orderService.findOrderByUsername(username);
+    }
+
+    @GetMapping("/findOrderByProductID")
+    public Object findOrderByProductID(@RequestParam UUID id) {
+        return orderService.findOrderByProductID(id);
+    }
+
     @PostMapping("/save")
     public Object save(OrderDTOForSave order) {
         return ResponseUtil.get(orderService.save(order), HttpStatus.OK);
+    }
+
+    @PostMapping("/{order-id}/addProducts")
+    public Object addProducts(@PathVariable("order-id") UUID orderID, @RequestBody List<UUID> productIDs) {
+        return ResponseUtil.get(orderService.addProducts(orderID, productIDs), HttpStatus.OK);
+    }
+
+    @PostMapping("/{order-id}/removeProducts")
+    public Object removeProducts(@PathVariable("order-id") UUID orderID, @RequestBody List<UUID> productIDs) {
+        return ResponseUtil.get(orderService.removeProducts(orderID, productIDs), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/delete")
+    public Object delete(@RequestParam UUID orderID) {
+        orderService.deleteByID(orderID);
+        return ResponseUtil.get("Delete Order Success", HttpStatus.OK);
     }
 }

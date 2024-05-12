@@ -54,4 +54,14 @@ public class ProductServiceImpl implements ProductService {
             return mapper.map(productRepository.save(product), ProductDTO.class);
         } else throw new WBHBussinessException("Product Not Found");
     }
+
+    @Override
+    public void deleteByID(UUID id) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new WBHBussinessException("Product Not Found"));
+        product.getOrders().forEach((order -> {
+            order.getProducts().remove(product);
+        }));
+        productRepository.delete(product);
+    }
 }

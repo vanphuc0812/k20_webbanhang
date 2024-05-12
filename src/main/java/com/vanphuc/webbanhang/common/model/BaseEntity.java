@@ -3,8 +3,9 @@ package com.vanphuc.webbanhang.common.model;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.vanphuc.webbanhang.common.utils.DateTimeUtils;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import lombok.experimental.UtilityClass;
 import org.springframework.data.annotation.CreatedBy;
@@ -16,7 +17,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.UUID;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @SuperBuilder // để lớp con kế thừa
 @MappedSuperclass //cho các lớp con kế thừa triển khai xuống DB để tạo bảng
@@ -60,4 +62,4 @@ public class BaseEntity {
         static final String LAST_MODIFIED_BY = "LAST_MODIFIED_BY";
         static final String LAST_MODIFIED_AT = "LAST_MODIFIED_AT";
     }
- }
+}

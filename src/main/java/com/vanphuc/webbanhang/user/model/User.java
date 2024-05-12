@@ -4,14 +4,16 @@ import com.vanphuc.webbanhang.common.model.BaseEntity;
 import com.vanphuc.webbanhang.order.model.Order;
 import com.vanphuc.webbanhang.order.model.OrderEntity;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @SuperBuilder
 @Entity

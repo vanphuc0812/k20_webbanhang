@@ -13,4 +13,6 @@ public interface ProductService extends GenericService<Product, ProductDTO, UUID
     ProductDTO save(ProductDTOForSave dto);
 
     ProductDTO update(ProductDTOForUpdate dto);
+
+    void deleteByID(UUID id);
 }

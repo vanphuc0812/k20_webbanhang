@@ -13,5 +13,16 @@ public interface OrderService extends GenericService<Order, OrderDTO, UUID> {
 
     List<OrderDTO> findAll();
 
+    List<OrderDTO> findOrderByProductID(UUID productId);
+
+    List<OrderDTO> findOrderByUsername(String username);
+    
     OrderDTO findById(UUID id);
+
+    OrderDTO addProducts(UUID orderID, List<UUID> productIDs);
+
+    OrderDTO removeProducts(UUID orderID, List<UUID> productIDs);
+
+    void deleteByID(UUID id);
+
 }

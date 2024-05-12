@@ -37,34 +37,96 @@ public class OrderServiceImpl implements OrderService {
     public OrderDTO save(OrderDTOForSave orderDTOForSave) {
         User user = userRepository.findByUsername(orderDTOForSave.getUsername())
                 .orElseThrow(() -> new WBHBussinessException("User not found"));
+        Order order = new Order();
         Set<Product> productList = new HashSet<>();
         final BigDecimal[] totalPrice = {BigDecimal.ZERO};
         orderDTOForSave.getProductIdList().forEach((productId) -> {
             Optional<Product> productOptional = productRepository.findById(productId);
             if (productOptional.isEmpty()) return;
-            totalPrice[0] = totalPrice[0].add(productOptional.get().getPrice());
+            Product product = productOptional.get();
+            totalPrice[0] = totalPrice[0].add(product.getPrice());
             productList.add(productOptional.get());
+            product.getOrders().add(order);
         });
         if (productList.isEmpty()) throw new WBHBussinessException("All inputted products are not found");
-
-        return mapper.map(orderRepository.save(new Order(user, totalPrice[0], productList)), OrderDTO.class);
+        order.setProducts(productList);
+        order.setTotalPrice(totalPrice[0]);
+        order.setUser(user);
+        user.getOrders().add(order);
+        return mapper.map(orderRepository.save(order), OrderDTO.class);
     }
 
     @Override
     public List<OrderDTO> findAll() {
-//        orderRepository.findAll().forEach(order -> System.out.println());
-        return orderRepository.findAll().stream().map((model) -> {
-                    System.out.println(model.getProducts().size());
-
-                    return mapper.map(model, OrderDTO.class);
-                }
+        return orderRepository.findAll().stream().map((model) ->
+                mapper.map(model, OrderDTO.class)
         ).toList();
+    }
+
+    @Override
+    public List<OrderDTO> findOrderByProductID(UUID productId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new WBHBussinessException("Product not found"));
+        return product.getOrders().stream()
+                .map((order -> mapper.map(order, OrderDTO.class))).toList();
+    }
+
+    @Override
+    public List<OrderDTO> findOrderByUsername(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new WBHBussinessException("User not found"));
+        return orderRepository.findByUsername(username).stream()
+                .map((order -> mapper.map(order, OrderDTO.class))).toList();
     }
 
     @Override
     public OrderDTO findById(UUID id) {
         Order order = orderRepository.findById(id).orElseThrow(() -> new WBHBussinessException("Order not found"));
         return mapper.map(order, OrderDTO.class);
+    }
+
+    @Override
+    public OrderDTO addProducts(UUID orderID, List<UUID> productIDs) {
+        Order order = orderRepository.findById(orderID)
+                .orElseThrow(() -> new WBHBussinessException("Order not found"));
+        productIDs.forEach((productId) -> {
+            Optional<Product> productOptional = productRepository.findById(productId);
+            if (productOptional.isEmpty()) return;
+            Product product = productOptional.get();
+            order.setTotalPrice(order.getTotalPrice().add(product.getPrice()));
+            order.getProducts().add(productOptional.get());
+            product.getOrders().add(order);
+        });
+        return mapper.map(orderRepository.save(order), OrderDTO.class);
+    }
+
+    @Override
+    public OrderDTO removeProducts(UUID orderID, List<UUID> productIDs) {
+        Order order = orderRepository.findById(orderID)
+                .orElseThrow(() -> new WBHBussinessException("Order not found"));
+        productIDs.forEach((productId) -> {
+            Optional<Product> productOptional = productRepository.findById(productId);
+            if (productOptional.isEmpty()) return;
+            Product product = productOptional.get();
+            // check if product existed in product list of order
+            if (order.getProducts().contains(product)) {
+                order.getProducts().remove(product);
+                product.getOrders().remove(order);
+                order.setTotalPrice(order.getTotalPrice().subtract(product.getPrice()));
+            }
+        });
+
+        return mapper.map(orderRepository.save(order), OrderDTO.class);
+    }
+
+    @Override
+    public void deleteByID(UUID id) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new WBHBussinessException("Order not found"));
+        order.getProducts().forEach((product -> {
+            product.getOrders().remove(order);
+        }));
+        orderRepository.delete(order);
     }
 
     @Override
