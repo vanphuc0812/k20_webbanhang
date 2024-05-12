@@ -1,8 +1,7 @@
 package com.vanphuc.webbanhang.product.model;
 
 import com.vanphuc.webbanhang.common.model.BaseEntity;
-import com.vanphuc.webbanhang.order.model.Order;
-import com.vanphuc.webbanhang.order.model.OrderEntity;
+import com.vanphuc.webbanhang.order.model.OrderProduct;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,7 +28,10 @@ public class Product extends BaseEntity {
     @Column(name = ProductEntity.PRICE)
     private BigDecimal price;
 
-    @ManyToMany(mappedBy = OrderEntity.OrderProduct.ORDER_MAPPED_PRODUCT,
+    //    @ManyToMany(mappedBy = OrderEntity.OrderProduct.ORDER_MAPPED_PRODUCT,
+//            cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+//    private Set<Order> orders = new LinkedHashSet<>();
+    @OneToMany(mappedBy = "product",
             cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    private Set<Order> orders = new LinkedHashSet<>();
+    private Set<OrderProduct> orderProducts = new LinkedHashSet<>();
 }

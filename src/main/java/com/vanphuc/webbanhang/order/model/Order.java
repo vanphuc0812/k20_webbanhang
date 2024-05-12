@@ -2,7 +2,6 @@ package com.vanphuc.webbanhang.order.model;
 
 
 import com.vanphuc.webbanhang.common.model.BaseEntity;
-import com.vanphuc.webbanhang.product.model.Product;
 import com.vanphuc.webbanhang.user.model.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -33,11 +32,13 @@ public class Order extends BaseEntity {
     private User user;
     private BigDecimal totalPrice;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinTable(
-            name = OrderEntity.OrderProduct.TABLE_NAME,
-            joinColumns = @JoinColumn(name = OrderEntity.OrderProduct.ORDERID),
-            inverseJoinColumns = @JoinColumn(name = OrderEntity.OrderProduct.PRODUCTID)
-    )
-    private Set<Product> products = new LinkedHashSet<>();
+    //    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+//    @JoinTable(
+//            name = OrderEntity.OrderProduct.TABLE_NAME,
+//            joinColumns = @JoinColumn(name = OrderEntity.OrderProduct.ORDERID),
+//            inverseJoinColumns = @JoinColumn(name = OrderEntity.OrderProduct.PRODUCTID)
+//    )
+    @OneToMany(mappedBy = "order",
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    private Set<OrderProduct> orderProducts = new LinkedHashSet<>();
 }

@@ -17,5 +17,4 @@ public class ProductDTO {
     private String catalog;
     private String image;
     private String price;
-//    private Set<Order> orders;
 }

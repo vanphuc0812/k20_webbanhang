@@ -57,11 +57,11 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void deleteByID(UUID id) {
-        Product product = productRepository.findById(id)
-                .orElseThrow(() -> new WBHBussinessException("Product Not Found"));
-        product.getOrders().forEach((order -> {
-            order.getProducts().remove(product);
-        }));
-        productRepository.delete(product);
+//        Product product = productRepository.findById(id)
+//                .orElseThrow(() -> new WBHBussinessException("Product Not Found"));
+//        product.getOrders().forEach((order -> {
+//            order.getProducts().remove(product);
+//        }));
+//        productRepository.delete(product);
     }
 }
