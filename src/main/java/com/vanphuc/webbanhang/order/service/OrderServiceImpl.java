@@ -7,6 +7,7 @@ import com.vanphuc.webbanhang.order.dto.OrderDTOForSave;
 import com.vanphuc.webbanhang.order.dto.OrderProductDTOForSave;
 import com.vanphuc.webbanhang.order.model.Order;
 import com.vanphuc.webbanhang.order.model.OrderProduct;
+import com.vanphuc.webbanhang.order.repository.OrderProductRepository;
 import com.vanphuc.webbanhang.order.repository.OrderRepository;
 import com.vanphuc.webbanhang.product.model.Product;
 import com.vanphuc.webbanhang.product.repository.ProductRepository;
@@ -26,12 +27,14 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
+    private final OrderProductRepository orderProductRepository;
     private final WBHMapper mapper;
 
-    public OrderServiceImpl(OrderRepository orderRepository, UserRepository userRepository, ProductRepository productRepository, WBHMapper mapper) {
+    public OrderServiceImpl(OrderRepository orderRepository, UserRepository userRepository, ProductRepository productRepository, OrderProductRepository orderProductRepository, WBHMapper mapper) {
         this.orderRepository = orderRepository;
         this.userRepository = userRepository;
         this.productRepository = productRepository;
+        this.orderProductRepository = orderProductRepository;
         this.mapper = mapper;
     }
 
@@ -105,16 +108,25 @@ public class OrderServiceImpl implements OrderService {
             Optional<Product> productOptional = productRepository.findById(orderProductDTO.getProductID());
             if (productOptional.isEmpty()) return;
             Product product = productOptional.get();
-            OrderProduct orderProduct = OrderProduct.builder()
-                    .quantity(orderProductDTO.getQuantity())
-                    .product(product)
-                    .order(order)
-                    .build();
+            OrderProduct orderProduct;
+            Optional<OrderProduct> orderProductOptional = orderProductRepository.findByOrderIdAndProductId(orderID, orderProductDTO.getProductID());
+            if (orderProductOptional.isPresent()) {
+                orderProduct = orderProductOptional.get();
+                orderProduct.setQuantity(orderProduct.getQuantity() + orderProductDTO.getQuantity());
+            } else {
+                orderProduct = OrderProduct.builder()
+                        .quantity(orderProductDTO.getQuantity())
+                        .product(product)
+                        .order(order)
+                        .build();
+            }
+
             order.setTotalPrice(
                     order.getTotalPrice().add(
                             product.getPrice().multiply(BigDecimal.valueOf(orderProductDTO.getQuantity()))
                     )
             );
+
             order.getOrderProducts().add(orderProduct);
             product.getOrderProducts().add(orderProduct);
         });
@@ -122,22 +134,42 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderDTO removeProducts(UUID orderID, List<OrderProductDTOForSave> productList) {
+    public Object removeProducts(UUID orderID, List<OrderProductDTOForSave> productList) {
         Order order = orderRepository.findById(orderID)
                 .orElseThrow(() -> new WBHBussinessException("Order not found"));
         productList.forEach((orderProductDto) -> {
             Optional<Product> productOptional = productRepository.findById(orderProductDto.getProductID());
             if (productOptional.isEmpty()) return;
             Product product = productOptional.get();
-            // check if product existed in product list of order
-//            if (order.getOrderProducts().contains(product)) {
-//                order.getProducts().remove(product);
-//                product.getOrders().remove(order);
-//                order.setTotalPrice(order.getTotalPrice().subtract(product.getPrice()));
-//            }
-            //TODO
-        });
+            OrderProduct orderProduct;
+            Optional<OrderProduct> orderProductOptional = orderProductRepository.findByOrderIdAndProductId(orderID, orderProductDto.getProductID());
 
+            if (orderProductOptional.isPresent()) {
+                orderProduct = orderProductOptional.get();
+                if (orderProduct.getQuantity() >= orderProductDto.getQuantity()) {
+                    orderProduct.setQuantity(orderProduct.getQuantity() - orderProductDto.getQuantity());
+                    order.setTotalPrice(
+                            order.getTotalPrice().subtract(
+                                    product.getPrice().multiply(BigDecimal.valueOf(orderProductDto.getQuantity()))
+                            )
+                    );
+                } else {
+                    order.setTotalPrice(
+                            order.getTotalPrice().subtract(product.getPrice()
+                                    .multiply(BigDecimal.valueOf(orderProduct.getQuantity())))
+                    );
+                    order.getOrderProducts().remove(orderProduct);
+                    product.getOrderProducts().remove(orderProduct);
+                    orderProductRepository.delete(orderProduct);
+                }
+            }
+        });
+        if (order.getOrderProducts().isEmpty()) {
+            order.getUser().getOrders().remove(order);
+            userRepository.save(order.getUser());
+            orderRepository.delete(order);
+            return "Deteled order due to product list is empty";
+        }
         return mapper.map(orderRepository.save(order), OrderDTO.class);
     }
 

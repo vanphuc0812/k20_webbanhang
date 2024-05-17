@@ -22,7 +22,7 @@ public interface OrderService extends GenericService<Order, OrderDTO, UUID> {
 
     OrderDTO addProducts(UUID orderID, List<OrderProductDTOForSave> productIDs);
 
-    OrderDTO removeProducts(UUID orderID, List<OrderProductDTOForSave> productList);
+    Object removeProducts(UUID orderID, List<OrderProductDTOForSave> productList);
 
     void deleteByID(UUID id);
 
