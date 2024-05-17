@@ -5,6 +5,7 @@ import com.vanphuc.webbanhang.order.dto.OrderDTOForSave;
 import com.vanphuc.webbanhang.order.dto.OrderProductDTOForSave;
 import com.vanphuc.webbanhang.order.service.OrderService;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,11 +21,13 @@ public class OrderRestResource {
     }
 
     @GetMapping("/findAll")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public Object findAll() {
         return orderService.findAll();
     }
 
     @GetMapping("/findByID")
+    @PreAuthorize("hasAuthority('USER')")
     public Object findByID(UUID id) {
         return orderService.findById(id);
     }

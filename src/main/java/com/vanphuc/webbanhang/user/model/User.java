@@ -26,6 +26,7 @@ public class User extends BaseEntity {
     private String password;
     @Column(name = UserEntity.User.EMAIL)
     private String email;
+    private String roles;
 
     @OneToMany(mappedBy = OrderEntity.OrderUser.ORDER_MAPPED_USER,
             cascade = {CascadeType.PERSIST, CascadeType.MERGE})
